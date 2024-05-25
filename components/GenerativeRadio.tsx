@@ -104,11 +104,12 @@ function AudioPlayer({ topics }: { topics: string[] }) {
           isStreaming.current = true;
           const audioUrl = URL.createObjectURL(audioBlob);
           const audio = new Audio(audioUrl);
+          audio.playbackRate = 0.95
 
           audio.onended = () => {
             isStreaming.current = false;
             URL.revokeObjectURL(audioUrl); // Clean up the object URL
-            setTimeout(() => playNextAudio(), 50);
+            setTimeout(() => playNextAudio(), 1);
           };
 
           audio.play().catch((error) => {
