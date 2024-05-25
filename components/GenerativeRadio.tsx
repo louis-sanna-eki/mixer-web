@@ -53,7 +53,7 @@ function Config() {
 
   return (
     <div className="max-w-md w-full space-y-4">
-      <h2 className="text-3xl font-bold">Pick a Topic</h2>
+      <h2 className="text-3xl font-bold"> Select Your Favorite Topics</h2>
       <div className="grid grid-cols-3 gap-4">
         {["AI", "Sport", "Tech"].map((topic) => (
           <Button
