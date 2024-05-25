@@ -91,8 +91,34 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   const [isDisliked, setIsDisliked] = useState(false);
   const { toast } = useToast();
 
+  const audioQueue = useRef<Blob[]>([]);
+  const isStreaming = useRef<boolean>(false);
+
   useEffect(() => {
     const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
+
+    const playNextAudio = () => {
+      if (audioQueue.current.length > 0 && !isStreaming.current) {
+        const audioBlob = audioQueue.current.shift();
+        if (audioBlob) {
+          isStreaming.current = true;
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+
+          audio.onended = () => {
+            isStreaming.current = false;
+            URL.revokeObjectURL(audioUrl); // Clean up the object URL
+            playNextAudio(); // Play the next audio in the queue
+          };
+
+          audio.play().catch((error) => {
+            console.error("Error playing audio:", error);
+            isStreaming.current = false; // Ensure playback state is reset
+            playNextAudio(); // Attempt to play the next audio in the queue
+          });
+        }
+      }
+    };
 
     socket.on("audio_stream", function (data: any) {
       const audioChunk = data.audio; // This is a base64-encoded string
@@ -123,12 +149,8 @@ function AudioPlayer({ topics }: { topics: string[] }) {
         }
 
         const audioBlob = new Blob([bytes], { type: "audio/wav" });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-
-        audio.play().catch((error) => {
-          console.error("Error playing audio:", error);
-        });
+        audioQueue.current.push(audioBlob);
+        playNextAudio(); // Attempt to play the next audio in the queue if possible
       } catch (error) {
         console.error("Error decoding base64 audio data:", error);
       }
