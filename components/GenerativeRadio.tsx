@@ -115,6 +115,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
           // Create an audio context
           // @ts-ignore
           const audioContext = new (window.AudioContext ||
+            // @ts-ignore
             window.webkitAudioContext)();
           const source = audioContext.createMediaElementSource(audio);
 
@@ -125,7 +126,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
           // Create a low-pass filter
           const lowpassFilter = audioContext.createBiquadFilter();
           lowpassFilter.type = "lowpass";
-          lowpassFilter.frequency.value = 10000; // Adjust the cutoff frequency as needed
+          lowpassFilter.frequency.value = 50000; // Adjust the cutoff frequency as needed
 
           // Connect the nodes: source -> gainNode -> lowpassFilter -> destination
           source.connect(gainNode);
