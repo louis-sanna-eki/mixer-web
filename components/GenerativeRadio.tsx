@@ -63,8 +63,6 @@ import React, { useRef, useState } from "react";
 function AudioPlayer() {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
 
   const togglePlayPause = () => {
     if (audioRef.current === null) return;
@@ -76,32 +74,19 @@ function AudioPlayer() {
     setIsPlaying(!isPlaying);
   };
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current === null) return;
-    setCurrentTime((audioRef.current as any).currentTime);
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current === null) return;
-    setDuration((audioRef.current as any).duration);
-  };
-
   return (
     <div className="max-w-md w-full space-y-4">
       <audio
         ref={audioRef}
         src="/sad-guitar-melody.wav"
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
       />
-
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <img
             alt="Album Cover"
             className="rounded-lg"
             height={64}
-            src="/placeholder.svg"
+            src="/gen-radio.png"
             style={{
               aspectRatio: "64/64",
               objectFit: "cover",
@@ -109,8 +94,8 @@ function AudioPlayer() {
             width={64}
           />
           <div>
-            <h3 className="text-xl font-bold">Floating Leaves</h3>
-            <p className="text-gray-400">Ambient Soundscape</p>
+            <h3 className="text-xl font-bold">Your Channel</h3>
+            <p className="text-gray-400">Just for you, in real time</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -135,26 +120,6 @@ function AudioPlayer() {
         </Button>
       </div>
     </div>
-  );
-}
-
-function FastForwardIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="13 19 22 12 13 5 13 19" />
-      <polygon points="2 19 11 12 2 5 2 19" />
-    </svg>
   );
 }
 
