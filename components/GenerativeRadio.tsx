@@ -94,12 +94,6 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   useEffect(() => {
     const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
 
-    postQuery(
-      `Create a radio report ${
-        topics.length ? "about" + topics.join(", ") : ""
-      }.`
-    );
-
     socket.on("audio_stream", function (data: any) {
       const audioChunk = data.audio; // This is a base64-encoded string
       console.log("Received audioChunk:", audioChunk);
@@ -149,9 +143,14 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   const togglePlayPause = () => {
     if (audioRef.current === null) return;
     if (isPlaying) {
-      (audioRef.current as any).pause();
+      // (audioRef.current as any).pause();
     } else {
-      (audioRef.current as any).play();
+      postQuery(
+        `Create a radio report ${
+          topics.length ? "about" + topics.join(", ") : ""
+        }.`
+      );
+      // (audioRef.current as any).play();
     }
     setIsPlaying(!isPlaying);
   };
