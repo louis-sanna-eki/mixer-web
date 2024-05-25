@@ -63,6 +63,8 @@ import React, { useRef, useState } from "react";
 function AudioPlayer() {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
 
   const togglePlayPause = () => {
     if (audioRef.current === null) return;
@@ -72,6 +74,20 @@ function AudioPlayer() {
       (audioRef.current as any).play();
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const toggleLike = () => {
+    setIsLiked(!isLiked);
+    if (isDisliked) {
+      setIsDisliked(false); // Ensure dislike is turned off when like is toggled
+    }
+  };
+
+  const toggleDislike = () => {
+    setIsDisliked(!isDisliked);
+    if (isLiked) {
+      setIsLiked(false); // Ensure like is turned off when dislike is toggled
+    }
   };
 
   return (
@@ -99,12 +115,12 @@ function AudioPlayer() {
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          <Button size="icon" variant="ghost">
-            <HeartIcon className="w-6 h-6" />
+          <Button size="icon" variant="ghost" onClick={toggleLike}>
+            <HeartIcon className={`w-6 h-6 ${isLiked ? 'text-red-500' : ''}`} />
             <span className="sr-only">Like</span>
           </Button>
-          <Button size="icon" variant="ghost">
-            <ThumbsDownIcon className="w-6 h-6" />
+          <Button size="icon" variant="ghost" onClick={toggleDislike}>
+            <ThumbsDownIcon className={`w-6 h-6 ${isDisliked ? 'text-blue-500' : ''}`} />
             <span className="sr-only">Dislike</span>
           </Button>
         </div>
@@ -180,7 +196,6 @@ function PauseIcon(props: any) {
     </svg>
   );
 }
-
 
 function ThumbsDownIcon(props: any) {
   return (
