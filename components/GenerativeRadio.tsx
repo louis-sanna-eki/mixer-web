@@ -26,16 +26,6 @@ export function GenerativeRadio() {
     <div className="flex flex-col h-screen bg-gray-900 text-white">
       <header className="bg-gray-800 py-4 px-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Generative Radio</h1>
-        {/* <div className="flex items-center space-x-4">
-          <Button size="icon" variant="ghost">
-            <HeartIcon className="w-6 h-6" />
-            <span className="sr-only">Liked Tracks</span>
-          </Button>
-          <Button size="icon" variant="ghost">
-            <SettingsIcon className="w-6 h-6" />
-            <span className="sr-only">Settings</span>
-          </Button>
-        </div> */}
       </header>
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 space-y-8">
         <div className="max-w-md w-full space-y-4">
