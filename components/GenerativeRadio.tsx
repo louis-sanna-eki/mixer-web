@@ -21,6 +21,7 @@ To read more about using these font, please visit the Next.js documentation:
 import React, { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 export function GenerativeRadio() {
   return (
@@ -79,6 +80,7 @@ function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
+  const { toast } = useToast();
 
   const togglePlayPause = () => {
     if (audioRef.current === null) return;
@@ -126,7 +128,19 @@ function AudioPlayer() {
           </div>
         </div>
         <div className="flex items-center space-x-4">
-          <Button size="icon" variant="ghost" onClick={toggleLike}>
+          <Button
+            size="icon"
+            variant="ghost"
+            // onClick={toggleLike}
+            onClick={() => {
+              if (!isLiked) {
+                toast({
+                  title: "We love you too 😍 !",
+                });
+              }
+              toggleLike();
+            }}
+          >
             <HeartIcon className={`w-6 h-6 ${isLiked ? "text-red-500" : ""}`} />
             <span className="sr-only">Like</span>
           </Button>
