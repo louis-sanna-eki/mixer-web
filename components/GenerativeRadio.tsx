@@ -92,10 +92,7 @@ function AudioPlayer() {
 
   return (
     <div className="max-w-md w-full space-y-4">
-      <audio
-        ref={audioRef}
-        src="/sad-guitar-melody.wav"
-      />
+      <audio ref={audioRef} src="/sad-guitar-melody.wav" />
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <img
@@ -116,11 +113,13 @@ function AudioPlayer() {
         </div>
         <div className="flex items-center space-x-4">
           <Button size="icon" variant="ghost" onClick={toggleLike}>
-            <HeartIcon className={`w-6 h-6 ${isLiked ? 'text-red-500' : ''}`} />
+            <HeartIcon className={`w-6 h-6 ${isLiked ? "text-red-500" : ""}`} />
             <span className="sr-only">Like</span>
           </Button>
           <Button size="icon" variant="ghost" onClick={toggleDislike}>
-            <ThumbsDownIcon className={`w-6 h-6 ${isDisliked ? 'text-blue-500' : ''}`} />
+            <ThumbsDownIcon
+              className={`w-6 h-6 ${isDisliked ? "text-blue-500" : ""}`}
+            />
             <span className="sr-only">Dislike</span>
           </Button>
         </div>
