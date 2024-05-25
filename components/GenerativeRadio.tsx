@@ -108,7 +108,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
           audio.onended = () => {
             isStreaming.current = false;
             URL.revokeObjectURL(audioUrl); // Clean up the object URL
-            playNextAudio(); // Play the next audio in the queue
+            setTimeout(() => playNextAudio(), 50);
           };
 
           audio.play().catch((error) => {
