@@ -104,13 +104,33 @@ function AudioPlayer({ topics }: { topics: string[] }) {
           isStreaming.current = true;
           const audioUrl = URL.createObjectURL(audioBlob);
           const audio = new Audio(audioUrl);
-          audio.playbackRate = 0.95
+          audio.playbackRate = 0.95;
 
           audio.onended = () => {
             isStreaming.current = false;
             URL.revokeObjectURL(audioUrl); // Clean up the object URL
             setTimeout(() => playNextAudio(), 1);
           };
+
+          // Create an audio context
+          // @ts-ignore
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const source = audioContext.createMediaElementSource(audio);
+
+          // Create a gain node for volume control
+          const gainNode = audioContext.createGain();
+          gainNode.gain.value = 10; // Increase the gain to make the audio louder (1 is normal volume, increase for louder)
+
+          // Create a low-pass filter
+          const lowpassFilter = audioContext.createBiquadFilter();
+          lowpassFilter.type = "lowpass";
+          lowpassFilter.frequency.value = 10000; // Adjust the cutoff frequency as needed
+
+          // Connect the nodes: source -> gainNode -> lowpassFilter -> destination
+          source.connect(gainNode);
+          gainNode.connect(lowpassFilter);
+          lowpassFilter.connect(audioContext.destination);
 
           audio.play().catch((error) => {
             console.error("Error playing audio:", error);
