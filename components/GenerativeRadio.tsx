@@ -18,6 +18,7 @@ To read more about using these font, please visit the Next.js documentation:
 - Pages Directory: https://nextjs.org/docs/pages/building-your-application/optimizing/fonts
 **/
 "use client";
+import React, { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -28,27 +29,50 @@ export function GenerativeRadio() {
         <h1 className="text-2xl font-bold">Generative Radio</h1>
       </header>
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 space-y-8">
-        <div className="max-w-md w-full space-y-4">
-          <h2 className="text-3xl font-bold">Pick a Topic</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <Button className="px-6 py-3 rounded-lg" variant="outline">
-              <span className="text-lg font-semibold">AI</span>
-            </Button>
-            <Button className="px-6 py-3 rounded-lg" variant="outline">
-              <span className="text-lg font-semibold">Sport</span>
-            </Button>
-            <Button className="px-6 py-3 rounded-lg" variant="outline">
-              <span className="text-lg font-semibold">Tech</span>
-            </Button>
-          </div>
-        </div>
+        <Config />
         <AudioPlayer />
       </div>
     </div>
   );
 }
 
-import React, { useRef, useState } from "react";
+function Config() {
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  const handleButtonClick = (topic: string) => {
+    setSelectedTopics((prevTopics) => {
+      if (prevTopics.includes(topic)) {
+        return prevTopics.filter((t) => t !== topic);
+      } else {
+        return [...prevTopics, topic];
+      }
+    });
+  };
+
+  const isSelected = (topic: string) => selectedTopics.includes(topic);
+
+  return (
+    <div className="max-w-md w-full space-y-4">
+      <h2 className="text-3xl font-bold">Pick a Topic</h2>
+      <div className="grid grid-cols-3 gap-4">
+        {["AI", "Sport", "Tech"].map((topic) => (
+          <Button
+            key={topic}
+            className={`px-6 py-3 rounded-lg ${
+              isSelected(topic) ? "opacity-100" : "opacity-50"
+            }`}
+            variant="outline"
+            onClick={() => handleButtonClick(topic)}
+          >
+            <span className="text-lg font-semibold">{topic}</span>
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default Config;
 
 function AudioPlayer() {
   const audioRef = useRef(null);
