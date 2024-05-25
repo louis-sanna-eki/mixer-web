@@ -18,28 +18,37 @@ To read more about using these font, please visit the Next.js documentation:
 - Pages Directory: https://nextjs.org/docs/pages/building-your-application/optimizing/fonts
 **/
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 export function GenerativeRadio() {
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-white">
       <header className="bg-gray-800 py-4 px-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Generative Radio</h1>
       </header>
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 space-y-8">
-        <Config />
-        <AudioPlayer />
+        <Config
+          selectedTopics={selectedTopics}
+          setSelectedTopics={setSelectedTopics}
+        />
+        <AudioPlayer topics={selectedTopics} />
       </div>
     </div>
   );
 }
 
-function Config() {
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-
+function Config({
+  selectedTopics,
+  setSelectedTopics,
+}: {
+  selectedTopics: string[];
+  setSelectedTopics: React.Dispatch<React.SetStateAction<string[]>>;
+}) {
   const handleButtonClick = (topic: string) => {
     setSelectedTopics((prevTopics) => {
       if (prevTopics.includes(topic)) {
@@ -75,12 +84,67 @@ function Config() {
 
 export default Config;
 
-function AudioPlayer() {
+function AudioPlayer({ topics }: { topics: string[] }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
+
+    postQuery(
+      `Create a radio report ${
+        topics.length ? "about" + topics.join(", ") : ""
+      }.`
+    );
+
+    socket.on("audio_stream", function (data: any) {
+      const audioChunk = data.audio; // This is a base64-encoded string
+      console.log("Received audioChunk:", audioChunk);
+
+      // Validate the base64 string
+      const isValidBase64 = (str: string) => {
+        try {
+          return btoa(atob(str)) === str;
+        } catch (err) {
+          return false;
+        }
+      };
+
+      if (!isValidBase64(audioChunk)) {
+        console.error("Invalid base64 audio data:", audioChunk);
+        return;
+      }
+
+      try {
+        // Convert base64 string to a Blob
+        const binaryString = atob(audioChunk);
+        const binaryLen = binaryString.length;
+        const bytes = new Uint8Array(binaryLen);
+
+        for (let i = 0; i < binaryLen; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        const audioBlob = new Blob([bytes], { type: "audio/wav" });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+
+        audio.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+      } catch (error) {
+        console.error("Error decoding base64 audio data:", error);
+      }
+    });
+
+    return () => {
+      socket.off("audio_stream");
+      socket.disconnect();
+    };
+  }, []);
 
   const togglePlayPause = () => {
     if (audioRef.current === null) return;
@@ -164,6 +228,31 @@ function AudioPlayer() {
       </div>
     </div>
   );
+}
+
+async function postQuery(query: string) {
+  const url = "http://185.157.247.62:5000/ai-radio";
+  const data = { query: query };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error:", errorData);
+    } else {
+      const responseData = await response.json();
+      console.log("Success:", responseData);
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }
 }
 
 function HeartIcon(props: any) {
