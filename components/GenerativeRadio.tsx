@@ -88,7 +88,6 @@ const FLY_URL = "https://mistralai-hackathon.fly.dev:5000/";
 // @ts-ignore
 const VM_URL = "http://185.157.247.62:5000/";
 
-
 function AudioPlayer({ topics }: { topics: string[] }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -99,10 +98,35 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   const audioQueue = useRef<Blob[]>([]);
   const isStreaming = useRef<boolean>(false);
 
+  const {
+    error,
+    interimResult,
+    isRecording,
+    results,
+    startSpeechToText,
+    stopSpeechToText,
+  } = useSpeechToText({
+    continuous: true,
+    useLegacyResults: false,
+  });
+
+  const hasSpotify = (results as any).some(
+    ({ transcript }: { transcript: string }) =>
+      transcript.toLocaleLowerCase().includes("spotify")
+  );
+  const hasNews = (results as any).some(
+    ({ transcript }: { transcript: string }) =>
+      transcript.toLocaleLowerCase().includes("news")
+  );
+
   useEffect(() => {
     const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
 
     const playNextAudio = () => {
+      if (hasSpotify || hasNews) {
+        audioQueue.current = [];
+        return;
+      }
       if (audioQueue.current.length > 0 && !isStreaming.current) {
         const audioBlob = audioQueue.current.shift();
         if (audioBlob) {
@@ -194,6 +218,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
     if (isPlaying) {
       // (audioRef.current as any).pause();
     } else {
+      startSpeechToText();
       postQuery(
         `Create a radio report ${
           topics.length ? "about " + topics.join(", ") : ""
@@ -218,8 +243,12 @@ function AudioPlayer({ topics }: { topics: string[] }) {
     }
   };
 
+  console.log("results", results);
+
   return (
     <div className="max-w-md w-full space-y-4">
+      {hasSpotify ? <audio src="/song.mp3" autoPlay /> : null}
+      {hasNews ? <audio src="/news.mp3" autoPlay /> : null}
       <audio ref={audioRef} src="/sad-guitar-melody.wav" />
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -380,3 +409,5 @@ function ThumbsDownIcon(props: any) {
     </svg>
   );
 }
+
+import useSpeechToText from "react-hook-speech-to-text";
