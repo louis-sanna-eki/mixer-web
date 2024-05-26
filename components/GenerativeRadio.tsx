@@ -122,6 +122,10 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   // const hasNews = newsIndex >= 0 && newsIndex > songIndex;
   const [hasSpotify, setHasSpotify] = useState(false);
   const [hasNews, setHasNews] = useState(false);
+  const stopStream = useRef(false)
+  if (hasNews || hasSpotify) {
+    stopStream.current = true;
+  }
 
   useEffect(() => {
     const handleKeyPress = (event: any) => {
@@ -148,7 +152,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
     const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
 
     const playNextAudio = () => {
-      if (hasSpotify || hasNews) {
+      if (stopStream.current) {
         audioQueue.current = [];
         return;
       }
