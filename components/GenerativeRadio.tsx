@@ -110,14 +110,16 @@ function AudioPlayer({ topics }: { topics: string[] }) {
     useLegacyResults: false,
   });
 
-  const hasSpotify = (results as any).some(
+  const songIndex = (results as any).findLastIndex(
     ({ transcript }: { transcript: string }) =>
       transcript.toLocaleLowerCase().includes("spotify")
   );
-  const hasNews = (results as any).some(
+  const newsIndex = (results as any).findLastIndex(
     ({ transcript }: { transcript: string }) =>
       transcript.toLocaleLowerCase().includes("news")
   );
+  const hasSpotify = songIndex >= 0 && songIndex >= newsIndex;
+  const hasNews = newsIndex >= 0 && newsIndex > songIndex;
 
   useEffect(() => {
     const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
