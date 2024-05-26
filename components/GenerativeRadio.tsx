@@ -98,28 +98,51 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   const audioQueue = useRef<Blob[]>([]);
   const isStreaming = useRef<boolean>(false);
 
-  const {
-    error,
-    interimResult,
-    isRecording,
-    results,
-    startSpeechToText,
-    stopSpeechToText,
-  } = useSpeechToText({
-    continuous: true,
-    useLegacyResults: false,
-  });
+  // const {
+  //   error,
+  //   interimResult,
+  //   isRecording,
+  //   results,
+  //   startSpeechToText,
+  //   stopSpeechToText,
+  // } = useSpeechToText({
+  //   continuous: true,
+  //   useLegacyResults: false,
+  // });
 
-  const songIndex = (results as any).findLastIndex(
-    ({ transcript }: { transcript: string }) =>
-      transcript.toLocaleLowerCase().includes("spotify")
-  );
-  const newsIndex = (results as any).findLastIndex(
-    ({ transcript }: { transcript: string }) =>
-      transcript.toLocaleLowerCase().includes("news")
-  );
-  const hasSpotify = songIndex >= 0 && songIndex >= newsIndex;
-  const hasNews = newsIndex >= 0 && newsIndex > songIndex;
+  // const songIndex = (results as any).findLastIndex(
+  //   ({ transcript }: { transcript: string }) =>
+  //     transcript.toLocaleLowerCase().includes("spotify")
+  // );
+  // const newsIndex = (results as any).findLastIndex(
+  //   ({ transcript }: { transcript: string }) =>
+  //     transcript.toLocaleLowerCase().includes("news")
+  // );
+  // const hasSpotify = songIndex >= 0 && songIndex >= newsIndex;
+  // const hasNews = newsIndex >= 0 && newsIndex > songIndex;
+  const [hasSpotify, setHasSpotify] = useState(false);
+  const [hasNews, setHasNews] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: any) => {
+      if (event.key === "S" || event.key === "s") {
+        setHasSpotify(true);
+        setHasNews(false);
+        console.log('The "S" key was pressed!');
+      }
+      if (event.key === "N" || event.key === "n") {
+        setHasSpotify(false);
+        setHasNews(true);
+        console.log('The "S" key was pressed!');
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
 
   useEffect(() => {
     const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
@@ -220,7 +243,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
     if (isPlaying) {
       // (audioRef.current as any).pause();
     } else {
-      startSpeechToText();
+      // startSpeechToText();
       postQuery(
         `Create a radio report ${
           topics.length ? "about " + topics.join(", ") : ""
@@ -244,8 +267,6 @@ function AudioPlayer({ topics }: { topics: string[] }) {
       setIsLiked(false); // Ensure like is turned off when dislike is toggled
     }
   };
-
-  console.log("results", results);
 
   return (
     <div className="max-w-md w-full space-y-4">
@@ -413,3 +434,4 @@ function ThumbsDownIcon(props: any) {
 }
 
 import useSpeechToText from "react-hook-speech-to-text";
+import { tree } from "next/dist/build/templates/app-page";
