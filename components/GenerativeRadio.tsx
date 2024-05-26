@@ -133,7 +133,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
       if (event.key === "N" || event.key === "n") {
         setHasSpotify(false);
         setHasNews(true);
-        console.log('The "S" key was pressed!');
+        console.log('The "N" key was pressed!');
       }
     };
 
@@ -175,7 +175,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
 
           // Create a gain node for volume control
           const gainNode = audioContext.createGain();
-          gainNode.gain.value = 10; // Increase the gain to make the audio louder (1 is normal volume, increase for louder)
+          gainNode.gain.value = hasSpotify || hasNews ? 0 : 10; // Increase the gain to make the audio louder (1 is normal volume, increase for louder)
 
           // Create a low-pass filter
           const lowpassFilter = audioContext.createBiquadFilter();
@@ -236,7 +236,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
       socket.off("audio_stream");
       socket.disconnect();
     };
-  }, []);
+  }, [hasNews, hasSpotify]);
 
   const togglePlayPause = () => {
     if (audioRef.current === null) return;
