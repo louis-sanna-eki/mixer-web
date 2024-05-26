@@ -100,7 +100,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
   const isStreaming = useRef<boolean>(false);
 
   useEffect(() => {
-    const socket: any = io(FLY_URL); // Replace with your actual server URL
+    const socket: any = io("http://185.157.247.62:5000/"); // Replace with your actual server URL
 
     const playNextAudio = () => {
       if (audioQueue.current.length > 0 && !isStreaming.current) {
@@ -196,7 +196,7 @@ function AudioPlayer({ topics }: { topics: string[] }) {
     } else {
       postQuery(
         `Create a radio report ${
-          topics.length ? "about" + topics.join(", ") : ""
+          topics.length ? "about " + topics.join(", ") : ""
         }.`
       );
       // (audioRef.current as any).play();
